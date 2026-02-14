@@ -704,6 +704,28 @@ class EntryRestController extends WallabagRestController
      *             example="http://www.test.com/article.html"
      *         )
      *     ),
+     *     @OA\Parameter(
+     *         name="reading_progress",
+     *         in="query",
+     *         description="Reading progress of the entry (0-100).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             minimum=0,
+     *             maximum=100,
+     *             default=0
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="reading_progress_updated_at",
+     *         in="query",
+     *         description="Timestamp of the reading progress update. Unix timestamp or ISO 8601 datetime.",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="1708905600"
+     *         )
+     *     ),
      *     @OA\Response(
      *         response="200",
      *         description="Returned when successful"
@@ -773,6 +795,17 @@ class EntryRestController extends WallabagRestController
 
         if (!empty($data['origin_url'])) {
             $entry->setOriginUrl($data['origin_url']);
+        }
+
+        if (null !== $data['readingProgress']) {
+            $progress = (int) $data['readingProgress'];
+            $timestamp = new \DateTime();
+            if (null !== $data['readingProgressUpdatedAt']) {
+                $timestamp = is_numeric($data['readingProgressUpdatedAt'])
+                    ? (new \DateTime())->setTimestamp((int) $data['readingProgressUpdatedAt'])
+                    : new \DateTime($data['readingProgressUpdatedAt']);
+            }
+            $entry->updateReadingProgress($progress, $timestamp);
         }
 
         if (null !== $data['isPublic']) {
@@ -927,6 +960,28 @@ class EntryRestController extends WallabagRestController
      *             example="http://www.test.com/article.html",
      *         )
      *     ),
+     *     @OA\Parameter(
+     *         name="reading_progress",
+     *         in="query",
+     *         description="Reading progress of the entry (0-100).",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="integer",
+     *             minimum=0,
+     *             maximum=100,
+     *             default=0
+     *         )
+     *     ),
+     *     @OA\Parameter(
+     *         name="reading_progress_updated_at",
+     *         in="query",
+     *         description="Timestamp of the reading progress update. Unix timestamp or ISO 8601 datetime.",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             example="1708905600",
+     *         )
+     *     ),
      *     @OA\Response(
      *         response="200",
      *         description="Returned when successful"
@@ -1005,6 +1060,17 @@ class EntryRestController extends WallabagRestController
 
         if (!empty($data['origin_url'])) {
             $entry->setOriginUrl($data['origin_url']);
+        }
+
+        if (null !== $data['readingProgress']) {
+            $progress = (int) $data['readingProgress'];
+            $timestamp = new \DateTime();
+            if (null !== $data['readingProgressUpdatedAt']) {
+                $timestamp = is_numeric($data['readingProgressUpdatedAt'])
+                    ? (new \DateTime())->setTimestamp((int) $data['readingProgressUpdatedAt'])
+                    : new \DateTime($data['readingProgressUpdatedAt']);
+            }
+            $entry->updateReadingProgress($progress, $timestamp);
         }
 
         if (empty($entry->getDomainName())) {
@@ -1415,6 +1481,8 @@ class EntryRestController extends WallabagRestController
             'publishedAt' => $request->request->get('published_at'),
             'authors' => $request->request->all()['authors'] ?? '',
             'origin_url' => $request->request->get('origin_url', ''),
+            'readingProgress' => $request->request->get('reading_progress'),
+            'readingProgressUpdatedAt' => $request->request->get('reading_progress_updated_at'),
         ];
     }
 }

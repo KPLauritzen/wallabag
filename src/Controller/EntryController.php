@@ -578,6 +578,27 @@ class EntryController extends AbstractController
         ]));
     }
 
+    #[Route(path: '/reading-progress/{id}', name: 'reading_progress_entry', methods: ['POST'], requirements: ['id' => '\d+'])]
+    #[IsGranted('EDIT', subject: 'entry')]
+    public function updateReadingProgressAction(Request $request, Entry $entry): Response
+    {
+        $progress = (int) $request->request->get('reading_progress', 0);
+        $timestamp = $request->request->get('reading_progress_updated_at');
+
+        $updatedAt = new \DateTime();
+        if (null !== $timestamp && is_numeric($timestamp)) {
+            $updatedAt = (new \DateTime())->setTimestamp((int) $timestamp);
+        }
+
+        $entry->updateReadingProgress($progress, $updatedAt);
+        $this->entityManager->flush();
+
+        return $this->json([
+            'reading_progress' => $entry->getReadingProgress(),
+            'reading_progress_updated_at' => $entry->getReadingProgressUpdatedAt()?->format('c'),
+        ]);
+    }
+
     /**
      * Ability to view a content publicly.
      *
