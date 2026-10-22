@@ -1,0 +1,15 @@
+.git
+node_modules
+var/cache
+var/logs
+var/sessions
+data/db/*.sqlite
+data/db/*.sqlite-journal
+vendor
+
+# Local files that must never be baked into the image (exports with user data,
+# local dev tooling). They are untracked/gitignored, so a CI checkout lacks
+# them anyway; this guards local builds.
+admin-export.json
+specialexport.json
+mise.toml
